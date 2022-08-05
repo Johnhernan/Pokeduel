@@ -1,7 +1,7 @@
 # Pokeduel!
 
 ## What is this?
-Pokeduel is a small game utilizing the React library and the pokemon API in order to create a rock, paper, scissor inspired game. 
+Pokeduel is a small game utilizing the React library and the pokemon API in order to create a rock, paper, scissors-like game. 
 
 ## Try it!
 Live demo at 
