@@ -7,18 +7,7 @@ export default createTheme({
             height: "40px",
         }
     },
-    //For overriding Built in components
-    components: {
-        //Example
-        // MuiContainer:{
-        //     styleOverrides: {
-        //         root: {
-        //             padding: "5% 14%",
-        //             textAlign: "center"
-        //         }
-        //     }
-        // },
-    },
+
     
     palette: {
         text: {

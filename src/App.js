@@ -1,25 +1,31 @@
-import { useState } from 'react';
-import { Box, Button, Typography, Grid} from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Button, Typography, Grid, Container} from '@mui/material';
 
 import Pokedex from 'pokedex-promise-v2'
 import Pokemon from './components/Pokemon';
-import { playerInterface } from './utils/playerInterface';
+import { Iplayer } from './utils/playerInterface';
 import scrapePokemon from './utils/scrapePokemon';
 import scrapeType from './utils/scrapeType';
-
-
+import { borderRadius } from '@mui/system';
 
 function App() {
-  // Rerolls icons 
-  // Lives Icons 
-  // Make both of these their own components 
-
   const P = new Pokedex();
-  const [ player1, setPlayer1 ] = useState(playerInterface)
-  const [ player2, setPlayer2 ] = useState(playerInterface);
+  const [ player1, setPlayer1 ] = useState(Iplayer);
+  const [ player2, setPlayer2 ] = useState(Iplayer);
   const [ fetchError, setFetchError ] = useState(false);
   const [ gameStart, setGameStart ] = useState(false);
-  const [ victor, setVictor ] = useState("");
+  const [ roundWinner, setRoundWinner ] = useState("");
+  const [ victor, setVictor] = useState("");
+
+  useEffect(()=> {
+    if( player1.lives === 0 || player2.lives === 0) {
+      setGameStart(false);
+      setRoundWinner(null)
+      player1.lives === 0 && setVictor("player1");
+      player2.lives === 0 && setVictor("player2");
+
+    }
+  })
 
   const fetchPokemons = async () => {
     try {
@@ -57,7 +63,16 @@ function App() {
     }
   }
 
-  const pokemonReroll = async (e) => {
+  // ----- Event Handlers
+  const handleGameStart = () => {
+    setPlayer1(Iplayer);
+    setPlayer2(Iplayer);
+    setVictor(false);
+    setGameStart(true);
+    fetchPokemons();
+  }
+
+  const HandlePokemonReroll = async (e) => {
     const { name: playerName } = e.target;
     let hasRolls = 0;
     if (playerName === "player1") hasRolls = player1.rerolls;
@@ -73,93 +88,112 @@ function App() {
     }
   }
 
-  // Event Handlers
-  const handleGameStart = () => {
-    setGameStart(true);
-    fetchPokemons();
-  }
-
   const handleFight = async () => {
     // Make an array of all possible weaknesses for the first pokemon
     let typeRes = await P.getTypeByName(player1.pokemon.types);
     const pokemon1Strengths = scrapeType(typeRes);
+
     typeRes = await P.getTypeByName(player2.pokemon.types);
     const pokemon2Strengths = scrapeType(typeRes);
-    // Get the score
-    const player1Points = countPoints(pokemon1Strengths, player1.pokemon.types);
-    const player2Points = countPoints(pokemon2Strengths, player2.pokemon.types);
 
-    if (player1Points < player2Points) {
-      setVictor("player1");
-      setPlayer1(prevValues => ({...prevValues, lives: prevValues.lives - 1}));
-    }
-    else if (player2Points < player1Points) {
-      setVictor("player2");
+    // Get the score
+    const player1Points = countPoints(pokemon1Strengths, player2.pokemon.types);
+    const player2Points = countPoints(pokemon2Strengths, player1.pokemon.types);
+    //console.log(player1Points, "p1", player2Points, "points")
+
+    if (player1Points > player2Points) {
+      setRoundWinner("player1");
       setPlayer2(prevValues => ({...prevValues, lives: prevValues.lives - 1}));
     }
-    if (player1Points === player2Points) {
-      setVictor("draw")
+    else if (player1Points < player2Points) {
+      setRoundWinner("player2");
+      setPlayer1(prevValues => ({...prevValues, lives: prevValues.lives - 1}));
     }
-
-    if( player1.lives === 0 || player2.lives === 0) {
-      setGameStart(false);
-      return;
+    else {
+      setRoundWinner("draw");
     }
-   fetchPokemons();
+    fetchPokemons();
   }
+  console.log("rendered")
 
-  
   return (
     <div className="App">
-      <Typography variant="h2">PokeDuel</Typography>
-      <Grid container justifyContent="center" columnGap={4}paddingY={4}>
-        <Grid item
-        >
-          <Pokemon
-            sprite= {player1.pokemon.sprite}
-            species= {player1.pokemon.species}
-            type={player1.pokemon.types[0]}
-            typeSecondary={player1.pokemon.types[1] && player1.pokemon.types[1]}
-            lives={player1.lives}
-            rerolls={player1.rerolls}
-          />
+      <Container sx={{  
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+        gap: "20px"
+        }}>
+        <Typography variant="h2">PokeDuel</Typography>
+        <Grid 
+          container 
+          sx={{ background: "#E8F9FD", borderRadius: "5px"}}
+          justifyContent="center"
+          alignItems="center"
+          columnGap={4}
+          rowGap={4}
+          paddingY={4}
+          xs={2}
+          md={8}
+        > 
+          <Grid item 
+          > 
+            <Pokemon
+              sprite= {player1.pokemon.sprite}
+              species= {player1.pokemon.species}
+              type={player1.pokemon.types[0]}
+              typeSecondary={player1.pokemon.types[1] && player1.pokemon.types[1]}
+              lives={player1.lives}
+              rerolls={player1.rerolls}
+            />
+            <Box sx={{display: "flex", justifyContent:"center"}}>
+              <Button name="player1" variant="contained" onClick={HandlePokemonReroll} disabled={!gameStart}>reroll</Button>
+            </Box>
+          </Grid>
 
-          <Button name="player1" variant="contained" onClick={pokemonReroll} disabled={!gameStart}>reroll</Button>
+          <Grid item>
+            <Typography>VS</Typography>
+          </Grid>
+
+          <Grid item>
+            <Pokemon
+              sprite= {player2.pokemon.sprite}
+              species= {player2.pokemon.species}
+              type={player2.pokemon.types[0]}
+              typeSecondary={player2.pokemon.types[1] && player2.pokemon.types[1]}
+              lives={player2.lives}
+              rerolls={player2.rerolls}
+            />
+            <Box sx={{display: "flex", justifyContent:"center"}}>
+              <Button name="player2" variant="contained" onClick={HandlePokemonReroll} disabled={!gameStart}>reroll</Button>
+            </Box>
+          </Grid>
         </Grid>
 
-        <Grid item>
-          <Typography> 
-            {victor === "player1" && "Player 1 Wins" }
-            {victor === "player2" && "Player 2 Wins" }
-            {victor === "draw" && "Draw" }
-          </Typography>
-        </Grid>
+        <Typography variant='h4'> 
+          {!victor && !roundWinner && "Battle!"}
+          {roundWinner === "player1" && "Player 1 Wins" }
+          {roundWinner === "player2" && "Player 2 Wins" }
+          {roundWinner === "draw" && "Draw" }
+          {victor ==="player1" ? "Player 1 Wins!" 
+          : victor==="player2" && "Player 2 Wins!"}
+        </Typography>
 
-        <Grid item>
-          <Pokemon
-            sprite= {player2.pokemon.sprite}
-            species= {player2.pokemon.species}
-            type={player2.pokemon.types[0]}
-            typeSecondary={player2.pokemon.types[1] && player2.pokemon.types[1]}
-            lives={player2.lives}
-            rerolls={player2.rerolls}
-          />
-          <Button name="player2" variant="contained" onClick={pokemonReroll} disabled={!gameStart}>reroll</Button>
-        </Grid>
-      </Grid>
-
-      <Box>
-        <Button variant="contained" onClick={handleGameStart} disabled={gameStart}>start</Button>
-        <Button variant="contained" onClick={handleFight} disabled={!gameStart}>Fight</Button>
-      </Box>
+        <Box>
+          <Button variant="contained" onClick={handleGameStart} disabled={gameStart}>start</Button>
+          <Button variant="contained" onClick={handleFight} disabled={!gameStart}>Fight</Button>
+        </Box>
+      </Container>
     </div>
   );
 }
 
 const countPoints = (strengths, opponentTypes) => {
   let points = 0;
-  strengths.forEach(t => {
-    if (opponentTypes.includes(t)) points += 1;
+  //Compares 
+  opponentTypes.forEach(t => {
+    if (strengths.includes(t)) points += 1;
   });
   return points; 
 }

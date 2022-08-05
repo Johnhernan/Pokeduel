@@ -1,4 +1,4 @@
-export const playerInterface = {
+export const Iplayer = {
     pokemon: {
         species: "",
         types: [],
