@@ -6,9 +6,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 .App {
-  color: white;
   min-height: 100vh;
+  color: white;
   background: #FF1E00;
 }

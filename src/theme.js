@@ -7,9 +7,29 @@ export default createTheme({
             height: "40px",
         }
     },
+    components: {
+        MuiButton: {
+            
+            styleOverrides: {
+                root: {
+                    background: "#100F0F",
+                    color: "white",
+                    "&:hover": {
+                        background: "grey"
+                    }
+
+                }
+            }
+        }
+    },
 
     
     palette: {
+        action: {
+            disabledBackground: "lightgrey",
+            disabled: "grey"
+
+        },
         text: {
             primary: '#000',
             secondary: '#DCDCE3'

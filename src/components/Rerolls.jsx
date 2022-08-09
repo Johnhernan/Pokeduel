@@ -1,5 +1,4 @@
-import { Box, Typography } from '@mui/material';
-import React from 'react'
+import { Grid, Typography } from '@mui/material';
 
 const Lives = (props) => {
     let rerolls = [];
@@ -7,12 +6,12 @@ const Lives = (props) => {
         rerolls.push(<Typography>♻️</Typography>)
     }
   return (
-    <Box sx={{display: "flex", alignItems: "baseline", padding: "0"}}>
+    <Grid container>
         <Typography>Rerolls:</Typography>
-        <Box sx={{display: "flex"}}>
+        
         {rerolls}
-        </Box>
-    </Box> 
+      
+    </Grid> 
   )
 }
 

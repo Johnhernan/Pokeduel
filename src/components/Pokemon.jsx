@@ -1,21 +1,19 @@
-import { Box, Avatar, Typography } from "@mui/material";
+import { Grid, Avatar, Typography } from "@mui/material";
 import Lives from "./Lives";
 import Rerolls from "./Rerolls";
 
 const Pokemon = (props) => {
   return (
-    <div style={{display: "flex", flexDirection: "column", alignContent: "center", padding: "1.25rem 1.50rem",}}>
-    <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          textAlign: "left",
+    <Grid
+      container
+      flexDirection="column"
+      alignItems="center"
+      gap="5px"
+      sx={{
           padding: "2rem",
-          alignItems: "center",
-          gap: "5px",
-          background: "darkgrey",
-        }}
-      >
+          background: "#413F42",
+          borderRadius: "5px"
+      }}>
         <Avatar src={props.sprite? props.sprite : "images/question_mark.png"} sx={{width:"100px", height: "100px"}} />
         <Typography>{props.species ? ` ${props.species}` : "???"}</Typography>
 
@@ -26,8 +24,7 @@ const Pokemon = (props) => {
         <Lives lives={props.lives}/> 
         <Rerolls rerolls={props.rerolls}/>
         
-      </Box>
-    </div>
+    </Grid>
   );
 };
 

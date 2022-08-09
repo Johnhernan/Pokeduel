@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Box, Button, Typography, Grid, Container} from '@mui/material';
+import { Button, Typography, Grid, Container} from '@mui/material';
 
 import Pokedex from 'pokedex-promise-v2'
 import Pokemon from './components/Pokemon';
 import { Iplayer } from './utils/playerInterface';
 import scrapePokemon from './utils/scrapePokemon';
 import scrapeType from './utils/scrapeType';
-import { borderRadius } from '@mui/system';
 
 function App() {
   const P = new Pokedex();
   const [ player1, setPlayer1 ] = useState(Iplayer);
   const [ player2, setPlayer2 ] = useState(Iplayer);
-  const [ fetchError, setFetchError ] = useState(false);
   const [ gameStart, setGameStart ] = useState(false);
   const [ roundWinner, setRoundWinner ] = useState("");
   const [ victor, setVictor] = useState("");
@@ -28,19 +26,16 @@ function App() {
   })
 
   const fetchPokemons = async () => {
-    try {
-      //Fetch two random pokemons utilizing pokeapi
-      const pokemon1Res = await P.getPokemonByName(Math.floor(Math.random() * 152) + 1);
-      const pokemon2Res = await P.getPokemonByName(Math.floor(Math.random() * 152) + 1);
-      const pokemon1 = scrapePokemon(pokemon1Res);
-      const pokemon2 = scrapePokemon(pokemon2Res);
+    //Fetch two random pokemons utilizing pokeapi
+    const pokemon1Res = await P.getPokemonByName(Math.floor(Math.random() * 152) + 1);
+    const pokemon2Res = await P.getPokemonByName(Math.floor(Math.random() * 152) + 1);
+    const pokemon1 = scrapePokemon(pokemon1Res);
+    const pokemon2 = scrapePokemon(pokemon2Res);
 
-      updatePlayerPokemon("player1", pokemon1);
-      updatePlayerPokemon("player2", pokemon2);
-      setGameStart(true);
-    } catch {
-      setFetchError(true);
-    }
+    updatePlayerPokemon("player1", pokemon1);
+    updatePlayerPokemon("player2", pokemon2);
+    setGameStart(true);
+
   }
 
   const updatePlayerPokemon = (option, data) => {
@@ -78,14 +73,12 @@ function App() {
     if (playerName === "player1") hasRolls = player1.rerolls;
     if (playerName === "player2") hasRolls = player2.rerolls;
     if (hasRolls === 0) return;
-    try {
-      const pokemonRes = await P.getPokemonByName(Math.floor(Math.random() * 152) + 1);
-      const pokemon = scrapePokemon(pokemonRes);
-      decreaseRerolls(playerName)
-      updatePlayerPokemon(playerName, pokemon);
-    } catch {
-      setFetchError(true);
-    }
+
+    const pokemonRes = await P.getPokemonByName(Math.floor(Math.random() * 152) + 1);
+    const pokemon = scrapePokemon(pokemonRes);
+    decreaseRerolls(playerName)
+    updatePlayerPokemon(playerName, pokemon);
+
   }
 
   const handleFight = async () => {
@@ -117,24 +110,31 @@ function App() {
   console.log("rendered")
 
   return (
-    <div className="App">
-      <Container sx={{  
+    <div className='App'>
+      <Container 
+      disableGutters="true"
+      sx={{  
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
-        gap: "20px"
+        padding: "4rem",
+        gap: "20px",
+
         }}>
         <Typography variant="h2">PokeDuel</Typography>
         <Grid 
           container 
-          sx={{ background: "#E8F9FD", borderRadius: "5px"}}
+          sx={{ 
+            background: "#E8F9FD", 
+            borderRadius: "5px",
+            padding: "4rem"
+          }}
           justifyContent="center"
           alignItems="center"
           columnGap={4}
           rowGap={4}
-          paddingY={4}
-          xs={2}
+          sm={6}
           md={8}
         > 
           <Grid item 
@@ -147,13 +147,13 @@ function App() {
               lives={player1.lives}
               rerolls={player1.rerolls}
             />
-            <Box sx={{display: "flex", justifyContent:"center"}}>
+            <Grid container paddingTop="10px" justifyContent="center">
               <Button name="player1" variant="contained" onClick={HandlePokemonReroll} disabled={!gameStart}>reroll</Button>
-            </Box>
+            </Grid>
           </Grid>
 
           <Grid item>
-            <Typography>VS</Typography>
+            <Typography sx={{color: "black", fontWeight: "Bold"}}>VS</Typography>
           </Grid>
 
           <Grid item>
@@ -165,9 +165,9 @@ function App() {
               lives={player2.lives}
               rerolls={player2.rerolls}
             />
-            <Box sx={{display: "flex", justifyContent:"center"}}>
+            <Grid container paddingTop="10px" justifyContent="center">
               <Button name="player2" variant="contained" onClick={HandlePokemonReroll} disabled={!gameStart}>reroll</Button>
-            </Box>
+            </Grid>
           </Grid>
         </Grid>
 
@@ -180,18 +180,20 @@ function App() {
           : victor==="player2" && "Player 2 Wins!"}
         </Typography>
 
-        <Box>
+        <Grid container justifyContent="center" gap={2}>
           <Button variant="contained" onClick={handleGameStart} disabled={gameStart}>start</Button>
           <Button variant="contained" onClick={handleFight} disabled={!gameStart}>Fight</Button>
-        </Box>
+        </Grid>
       </Container>
     </div>
+
+
   );
 }
 
 const countPoints = (strengths, opponentTypes) => {
   let points = 0;
-  //Compares 
+  //Compares the opponent types tries to find it displayed on our list of strengths
   opponentTypes.forEach(t => {
     if (strengths.includes(t)) points += 1;
   });

@@ -1,5 +1,5 @@
-import { Box, Typography } from '@mui/material';
-import React from 'react'
+import { Typography, Grid } from '@mui/material';
+import React from 'react';
 
 const Lives = (props) => {
     let lives = [];
@@ -7,11 +7,12 @@ const Lives = (props) => {
         lives.push(<Typography>🖤</Typography>)
     }
   return (
-    <Box sx={{display: "flex", alignItems: "baseline", padding: "0"}}>
+    <Grid container>
         <Typography>Lives:</Typography>
         {lives}
-    </Box> 
+    </Grid> 
   )
 }
 
 export default Lives
+//sx={{display: "flex", alignItems: "baseline"}}
